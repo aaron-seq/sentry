@@ -33,6 +33,7 @@ class BuildDetailsAppInfo(BaseModel):
     platform: Platform | None = None
     is_installable: bool
     build_configuration: str | None = None
+    app_icon_id: str | None = None
     apple_app_info: AppleAppInfo | None = None
 
 
@@ -163,6 +164,7 @@ def transform_preprod_artifact_to_build_details(
         build_configuration=(
             artifact.build_configuration.name if artifact.build_configuration else None
         ),
+        app_icon_id=artifact.app_icon_id,
         apple_app_info=apple_app_info,
     )
 
