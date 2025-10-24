@@ -10,6 +10,7 @@ import {t} from 'sentry/locale';
 import {formatBytesBase10} from 'sentry/utils/bytes/formatBytesBase10';
 import {getFormat, getFormattedDate, getUtcToSystem} from 'sentry/utils/dates';
 import {unreachable} from 'sentry/utils/unreachable';
+import useOrganization from 'sentry/utils/useOrganization';
 import {openInstallModal} from 'sentry/views/preprod/components/installModal';
 import {
   BuildDetailsSizeAnalysisState,
@@ -70,6 +71,7 @@ interface BuildDetailsSidebarAppInfoProps {
 }
 
 export function BuildDetailsSidebarAppInfo(props: BuildDetailsSidebarAppInfoProps) {
+  const organization = useOrganization();
   const labels = getLabels(props.appInfo.platform ?? undefined);
 
   const datetimeFormat = getFormat({
@@ -77,12 +79,18 @@ export function BuildDetailsSidebarAppInfo(props: BuildDetailsSidebarAppInfoProp
     timeZone: true,
   });
 
+  let iconUrl = null;
+  if (props.appInfo.app_icon_id) {
+    iconUrl = `/api/0/projects/${organization.slug}/${props.projectId}/files/app-icons/${props.appInfo.app_icon_id}/`;
+  }
+
   return (
     <Flex direction="column" gap="xl">
       <Flex align="center" gap="sm">
-        <AppIcon>
+        {iconUrl && <img src={iconUrl} alt="App Icon" width={24} height={24} />}
+        {!iconUrl && (
           <AppIconPlaceholder>{props.appInfo.name?.charAt(0) || ''}</AppIconPlaceholder>
-        </AppIcon>
+        )}
         {props.appInfo.name && <Heading as="h3">{props.appInfo.name}</Heading>}
       </Flex>
 
@@ -196,19 +204,16 @@ export function BuildDetailsSidebarAppInfo(props: BuildDetailsSidebarAppInfoProp
   );
 }
 
-const AppIcon = styled('div')`
+const AppIconPlaceholder = styled('div')`
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  background: #ff6600;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-`;
-
-const AppIconPlaceholder = styled('div')`
-  color: white;
+  background: ${p => p.theme.purple400};
+  color: ${p => p.theme.white};
   font-weight: ${p => p.theme.fontWeight.bold};
   font-size: ${p => p.theme.fontSize.sm};
 `;

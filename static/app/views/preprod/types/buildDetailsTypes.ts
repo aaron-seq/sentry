@@ -9,6 +9,7 @@ export interface BuildDetailsApiResponse {
 }
 
 export interface BuildDetailsAppInfo {
+  app_icon_id?: string | null;
   app_id?: string | null;
   apple_app_info?: AppleAppInfo | null;
   artifact_type?: BuildDetailsArtifactType | null;
