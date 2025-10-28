@@ -4,6 +4,7 @@ import logging
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
+import sentry.services.eventstore  # NOQA
 from sentry.models.activity import Activity
 from sentry.models.grouphistory import GroupHistoryStatus, record_group_history
 from sentry.models.project import Project
