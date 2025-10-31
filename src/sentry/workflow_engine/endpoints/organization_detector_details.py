@@ -45,6 +45,7 @@ from sentry.workflow_engine.types import DetectorLifeCycleHooks
 
 logger = logging.getLogger(__name__)
 
+
 def get_detector_validator(
     request: Request, project: Project, detector_type_slug: str, instance=None, partial=False
 ):

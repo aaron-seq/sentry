@@ -783,6 +783,7 @@ class OrganizationDetectorDetailsDeleteTest(OrganizationDetectorDetailsBaseTest)
         mock_seer_request.assert_called_once_with(
             source_id=self.data_source.id, organization=self.organization
         )
+
     def test_detector_life_cycle_delete_hook(self) -> None:
         detector_settings = DetectorSettings(
             hooks=DetectorLifeCycleHooks(pending_delete=mock.Mock())
