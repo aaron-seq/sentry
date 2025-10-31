@@ -223,6 +223,7 @@ class SentryApp(ParanoidModel, HasApiScopes, Model):
                 object_identifier=self.id,
                 category=OutboxCategory.SENTRY_APP_DELETE,
                 region_name=region_name,
+                payload={"slug": self.slug},
             )
             for region_name in find_all_region_names()
         ]
@@ -240,8 +241,8 @@ class SentryApp(ParanoidModel, HasApiScopes, Model):
             for outbox in self.outboxes_for_delete():
                 outbox.save()
 
-        SentryAppAvatar.objects.filter(sentry_app=self).delete()
-        return super().delete(*args, **kwargs)
+            SentryAppAvatar.objects.filter(sentry_app=self).delete()
+            return super().delete(*args, **kwargs)
 
     def _disable(self):
         self.events = []

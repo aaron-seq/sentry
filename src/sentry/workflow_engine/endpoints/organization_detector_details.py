@@ -41,9 +41,9 @@ from sentry.workflow_engine.endpoints.validators.detector_workflow import (
 )
 from sentry.workflow_engine.endpoints.validators.utils import get_unknown_detector_type_error
 from sentry.workflow_engine.models import DataSourceDetector, Detector
+from sentry.workflow_engine.types import DetectorLifeCycleHooks
 
 logger = logging.getLogger(__name__)
-
 
 def get_detector_validator(
     request: Request, project: Project, detector_type_slug: str, instance=None, partial=False
@@ -206,6 +206,11 @@ class OrganizationDetectorDetailsEndpoint(OrganizationEndpoint):
 
         if detector.type == ErrorGroupType.slug:
             return Response(status=403)
+
+        RegionScheduledDeletion.schedule(detector, days=0, actor=request.user)
+        detector.update(status=ObjectStatus.PENDING_DELETION)
+
+        DetectorLifeCycleHooks.on_pending_delete(detector)
 
         if detector.type == MetricIssue.slug:
             schedule_update_project_config(detector)
