@@ -6,9 +6,9 @@ import {textWithMarkupMatcher} from 'sentry-test/utils';
 
 import {ProductSolution} from 'sentry/components/onboarding/gettingStartedDoc/types';
 
-import docs from './nestjs';
+import docs from '.';
 
-describe('Nest.js onboarding docs', () => {
+describe('nestjs onboarding docs', () => {
   it('renders onboarding docs correctly', () => {
     renderWithOnboardingLayout(docs);
 
@@ -22,19 +22,11 @@ describe('Nest.js onboarding docs', () => {
 
     // Includes import statement
     const allMatches = screen.getAllByText(
-      textWithMarkupMatcher(/import \{ SentryModule } from '@sentry\/nestjs\/setup'/)
+      textWithMarkupMatcher(/import \* as Sentry from "@sentry\/nestjs"/)
     );
     allMatches.forEach(match => {
       expect(match).toBeInTheDocument();
     });
-  });
-
-  it('includes root module', () => {
-    renderWithOnboardingLayout(docs);
-
-    expect(
-      screen.getByText(textWithMarkupMatcher(/SentryModule\.forRoot\(\)/))
-    ).toBeInTheDocument();
   });
 
   it('displays sample rates by default', () => {
@@ -52,71 +44,6 @@ describe('Nest.js onboarding docs', () => {
     expect(
       screen.getByText(textWithMarkupMatcher(/profilesSampleRate: 1\.0/))
     ).toBeInTheDocument();
-  });
-
-  it('enables performance setting the tracesSampleRate to 1', () => {
-    renderWithOnboardingLayout(docs, {
-      selectedProducts: [
-        ProductSolution.ERROR_MONITORING,
-        ProductSolution.PERFORMANCE_MONITORING,
-      ],
-    });
-
-    expect(
-      screen.getByText(textWithMarkupMatcher(/tracesSampleRate: 1\.0/))
-    ).toBeInTheDocument();
-  });
-
-  it('enables profiling by setting profiling samplerates', () => {
-    renderWithOnboardingLayout(docs, {
-      selectedProducts: [ProductSolution.ERROR_MONITORING, ProductSolution.PROFILING],
-    });
-
-    expect(
-      screen.getByText(
-        textWithMarkupMatcher(
-          /import \{ nodeProfilingIntegration } from "@sentry\/profiling-node"/
-        )
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(textWithMarkupMatcher(/profilesSampleRate: 1\.0/))
-    ).toBeInTheDocument();
-  });
-
-  it('continuous profiling', () => {
-    const organization = OrganizationFixture({
-      features: ['continuous-profiling'],
-    });
-
-    renderWithOnboardingLayout(
-      docs,
-      {},
-      {
-        organization,
-      }
-    );
-
-    expect(
-      screen.getByText(
-        textWithMarkupMatcher(
-          /import \{ nodeProfilingIntegration } from "@sentry\/profiling-node"/
-        )
-      )
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(textWithMarkupMatcher(/profileLifecycle: 'trace'/))
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(textWithMarkupMatcher(/profileSessionSampleRate: 1\.0/))
-    ).toBeInTheDocument();
-
-    // Profiles sample rate should not be set for continuous profiling
-    expect(
-      screen.queryByText(textWithMarkupMatcher(/profilesSampleRate: 1\.0/))
-    ).not.toBeInTheDocument();
   });
 
   it('enables logs by setting enableLogs to true', () => {
@@ -176,6 +103,71 @@ describe('Nest.js onboarding docs', () => {
       screen.queryByText(
         textWithMarkupMatcher(/Sentry\.logger\.info\('User triggered test error'/)
       )
+    ).not.toBeInTheDocument();
+  });
+
+  it('enables performance setting the tracesSampleRate to 1', () => {
+    renderWithOnboardingLayout(docs, {
+      selectedProducts: [
+        ProductSolution.ERROR_MONITORING,
+        ProductSolution.PERFORMANCE_MONITORING,
+      ],
+    });
+
+    expect(
+      screen.getByText(textWithMarkupMatcher(/tracesSampleRate: 1\.0/))
+    ).toBeInTheDocument();
+  });
+
+  it('enables profiling by setting profiling samplerates', () => {
+    renderWithOnboardingLayout(docs, {
+      selectedProducts: [ProductSolution.ERROR_MONITORING, ProductSolution.PROFILING],
+    });
+
+    expect(
+      screen.getByText(
+        textWithMarkupMatcher(
+          /const { nodeProfilingIntegration } = require\("@sentry\/profiling-node"\)/
+        )
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(textWithMarkupMatcher(/profilesSampleRate: 1\.0/))
+    ).toBeInTheDocument();
+  });
+
+  it('continuous profiling', () => {
+    const organization = OrganizationFixture({
+      features: ['continuous-profiling'],
+    });
+
+    renderWithOnboardingLayout(
+      docs,
+      {},
+      {
+        organization,
+      }
+    );
+
+    expect(
+      screen.getByText(
+        textWithMarkupMatcher(
+          /const { nodeProfilingIntegration } = require\("@sentry\/profiling-node"\)/
+        )
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(textWithMarkupMatcher(/profileLifecycle: 'trace'/))
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(textWithMarkupMatcher(/profileSessionSampleRate: 1\.0/))
+    ).toBeInTheDocument();
+
+    // Profiles sample rate should not be set for continuous profiling
+    expect(
+      screen.queryByText(textWithMarkupMatcher(/profilesSampleRate: 1\.0/))
     ).not.toBeInTheDocument();
   });
 });
