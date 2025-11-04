@@ -43,6 +43,7 @@ from sentry.uptime.consumers.results_consumer import UptimeResultsStrategyFactor
 from sentry.uptime.grouptype import UptimeDomainCheckFailure
 from sentry.uptime.models import UptimeSubscription, UptimeSubscriptionRegion
 from sentry.uptime.subscriptions.subscriptions import (
+    SeatAssignmentResult,
     UptimeMonitorNoSeatAvailable,
     disable_uptime_detector,
     enable_uptime_detector,
@@ -859,7 +860,9 @@ class ProcessResultTest(ConfigPusherTestMixin, metaclass=abc.ABCMeta):
             mock.patch("sentry.uptime.autodetect.result_handler.logger") as onboarding_logger,
             mock.patch(
                 "sentry.uptime.autodetect.result_handler.update_uptime_detector",
-                side_effect=UptimeMonitorNoSeatAvailable(None),
+                side_effect=UptimeMonitorNoSeatAvailable(
+                    SeatAssignmentResult(assignable=False, reason="Testing")
+                ),
             ),
             self.tasks(),
             self.feature(features),
