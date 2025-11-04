@@ -1260,6 +1260,11 @@ function buildRoutes(): RouteObject[] {
       name: t('Stats'),
       children: statsChildren,
     },
+    {
+      path: 'data-forwarding/',
+      name: t('Data Forwarding'),
+      component: make(() => import('sentry/views/settings/organizationDataForwarding')),
+    },
   ];
   const orgSettingsRoutes: SentryRouteObject = {
     component: make(
