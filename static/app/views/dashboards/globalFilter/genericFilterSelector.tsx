@@ -10,11 +10,18 @@ export type GenericFilterSelectorProps = {
   onRemoveFilter: (filter: GlobalFilter) => void;
   onUpdateFilter: (filter: GlobalFilter) => void;
   searchBarData: SearchBarData;
+} & FilterConfigProps;
+
+type FilterConfigProps = {
+  isBoolean?: boolean;
 };
 
-function getFilterSelector(
-  globalFilter: GlobalFilter
-): React.ComponentType<GenericFilterSelectorProps> {
+type FilterSelectorConfig = {
+  component: React.ComponentType<GenericFilterSelectorProps>;
+  configProps?: FilterConfigProps;
+};
+
+function getFilterSelector(globalFilter: GlobalFilter): FilterSelectorConfig {
   const fieldDefinition = getFieldDefinitionForDataset(
     globalFilter.tag,
     globalFilter.dataset
@@ -22,16 +29,29 @@ function getFilterSelector(
   switch (fieldDefinition?.valueType) {
     case FieldValueType.NUMBER:
     case FieldValueType.DURATION:
-      return NumericFilterSelector;
+      return {
+        component: NumericFilterSelector,
+      };
+    case FieldValueType.BOOLEAN:
+      return {
+        component: FilterSelector,
+        configProps: {
+          isBoolean: true,
+        },
+      };
     case FieldValueType.STRING:
     default:
-      return FilterSelector;
+      return {
+        component: FilterSelector,
+      };
   }
 }
 
 function GenericFilterSelector({globalFilter, ...props}: GenericFilterSelectorProps) {
-  const FilterSelectorForType = getFilterSelector(globalFilter);
-  return <FilterSelectorForType globalFilter={globalFilter} {...props} />;
+  const {component: FilterSelectorForType, configProps} = getFilterSelector(globalFilter);
+  return (
+    <FilterSelectorForType globalFilter={globalFilter} {...props} {...configProps} />
+  );
 }
 
 export default GenericFilterSelector;

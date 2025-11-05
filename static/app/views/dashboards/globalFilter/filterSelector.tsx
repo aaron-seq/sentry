@@ -5,6 +5,7 @@ import isEqual from 'lodash/isEqual';
 import {Flex} from '@sentry/scraps/layout';
 
 import {Button} from 'sentry/components/core/button';
+import {CompactSelect} from 'sentry/components/core/compactSelect';
 import {HybridFilter} from 'sentry/components/organizations/hybridFilter';
 import {MutableSearch} from 'sentry/components/searchSyntax/mutableSearch';
 import {t} from 'sentry/locale';
@@ -22,6 +23,7 @@ type FilterSelectorProps = {
   onRemoveFilter: (filter: GlobalFilter) => void;
   onUpdateFilter: (filter: GlobalFilter) => void;
   searchBarData: SearchBarData;
+  isBoolean?: boolean;
 };
 
 function FilterSelector({
@@ -29,6 +31,7 @@ function FilterSelector({
   searchBarData,
   onRemoveFilter,
   onUpdateFilter,
+  isBoolean = false,
 }: FilterSelectorProps) {
   // Parse global filter condition to retrieve initial state
   const initialValues = useMemo(() => {
@@ -63,13 +66,20 @@ function FilterSelector({
       return result ?? [];
     },
     placeholderData: keepPreviousData,
-    enabled: true,
+    enabled: !isBoolean,
     staleTime: 5 * 60 * 1000,
   });
 
   const {data: fetchedFilterValues, isFetching} = queryResult;
 
   const options = useMemo(() => {
+    if (isBoolean) {
+      return [
+        {label: 'True', value: 'True'},
+        {label: 'False', value: 'False'},
+      ];
+    }
+
     const optionMap = new Map<string, {label: string; value: string}>();
     const addOption = (value: string) => optionMap.set(value, {label: value, value});
 
@@ -89,7 +99,13 @@ function FilterSelector({
     // and avoid losing their original order from the fetched results
     // (e.g. without this, all staged values would be grouped at the top of the list)
     return Array.from(optionMap.values()).reverse();
-  }, [fetchedFilterValues, activeFilterValues, stagedFilterValues, searchQuery]);
+  }, [
+    isBoolean,
+    fetchedFilterValues,
+    activeFilterValues,
+    stagedFilterValues,
+    searchQuery,
+  ]);
 
   const handleChange = (opts: string[]) => {
     if (isEqual(opts, activeFilterValues)) {
@@ -112,11 +128,66 @@ function FilterSelector({
     });
   };
 
+  const filterSelectorTrigger = (
+    <FilterSelectorTrigger
+      globalFilter={globalFilter}
+      activeFilterValues={initialValues}
+      options={options}
+      queryResult={queryResult}
+    />
+  );
+
+  const menuHeaderTrailingItems = ({closeOverlay}: any) => (
+    <Flex gap="md">
+      {activeFilterValues.length > 0 && (
+        <StyledButton
+          aria-label={t('Clear Selections')}
+          size="zero"
+          borderless
+          onClick={() => {
+            setSearchQuery('');
+            handleChange([]);
+            closeOverlay();
+          }}
+        >
+          {t('Clear')}
+        </StyledButton>
+      )}
+      <StyledButton
+        aria-label={t('Remove Filter')}
+        size="zero"
+        onClick={() => onRemoveFilter(globalFilter)}
+      >
+        {t('Remove Filter')}
+      </StyledButton>
+    </Flex>
+  );
+
+  if (isBoolean) {
+    return (
+      <CompactSelect
+        options={options}
+        value={activeFilterValues.length > 0 ? activeFilterValues[0] : undefined}
+        onChange={option => {
+          const newValue = option?.value;
+          handleChange(newValue ? [newValue] : []);
+        }}
+        onClose={() => {
+          setStagedFilterValues([]);
+        }}
+        menuTitle={t('%s Filter', getDatasetLabel(dataset))}
+        menuHeaderTrailingItems={menuHeaderTrailingItems}
+        triggerProps={{
+          children: filterSelectorTrigger,
+        }}
+      />
+    );
+  }
+
   return (
     <HybridFilter
       checkboxPosition="leading"
       searchable
-      disabled={false}
       options={options}
       value={activeFilterValues}
       searchPlaceholder={t('Search filter values...')}
@@ -136,40 +207,9 @@ function FilterSelector({
         isFetching ? t('Loading filter values...') : t('No filter values found')
       }
       menuTitle={t('%s Filter', getDatasetLabel(dataset))}
-      menuHeaderTrailingItems={({closeOverlay}: any) => (
-        <Flex gap="md">
-          {activeFilterValues.length > 0 && (
-            <StyledButton
-              aria-label={t('Clear Selections')}
-              size="zero"
-              borderless
-              onClick={() => {
-                setSearchQuery('');
-                handleChange([]);
-                closeOverlay();
-              }}
-            >
-              {t('Clear')}
-            </StyledButton>
-          )}
-          <StyledButton
-            aria-label={t('Remove Filter')}
-            size="zero"
-            onClick={() => onRemoveFilter(globalFilter)}
-          >
-            {t('Remove Filter')}
-          </StyledButton>
-        </Flex>
-      )}
+      menuHeaderTrailingItems={menuHeaderTrailingItems}
       triggerProps={{
-        children: (
-          <FilterSelectorTrigger
-            globalFilter={globalFilter}
-            activeFilterValues={initialValues}
-            options={options}
-            queryResult={queryResult}
-          />
-        ),
+        children: filterSelectorTrigger,
       }}
     />
   );
