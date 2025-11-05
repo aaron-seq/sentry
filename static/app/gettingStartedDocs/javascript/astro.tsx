@@ -27,6 +27,7 @@ import {t, tct} from 'sentry/locale';
 import {
   getJavascriptFullStackOnboarding,
   getJavascriptLogsFullStackOnboarding,
+  getJavascriptMetricsFullStackOnboarding,
 } from 'sentry/utils/gettingStartedDocs/javascript';
 import {getNodeAgentMonitoringOnboarding} from 'sentry/utils/gettingStartedDocs/node';
 
@@ -562,6 +563,10 @@ const docs: Docs = {
   crashReportOnboarding,
   featureFlagOnboarding: featureFlag,
   logsOnboarding: getJavascriptLogsFullStackOnboarding({
+    docsPlatform: 'astro',
+    packageName: '@sentry/astro',
+  }),
+  metricsOnboarding: getJavascriptMetricsFullStackOnboarding({
     docsPlatform: 'astro',
     packageName: '@sentry/astro',
   }),

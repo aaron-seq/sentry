@@ -23,6 +23,7 @@ import {t, tct} from 'sentry/locale';
 import {
   getJavascriptFullStackOnboarding,
   getJavascriptLogsFullStackOnboarding,
+  getJavascriptMetricsFullStackOnboarding,
 } from 'sentry/utils/gettingStartedDocs/javascript';
 import {getNodeAgentMonitoringOnboarding} from 'sentry/utils/gettingStartedDocs/node';
 
@@ -555,6 +556,10 @@ const docs: Docs = {
     configFileName: 'instrument.server.mjs',
   }),
   logsOnboarding: getJavascriptLogsFullStackOnboarding({
+    docsPlatform: 'react-router',
+    packageName: '@sentry/react-router',
+  }),
+  metricsOnboarding: getJavascriptMetricsFullStackOnboarding({
     docsPlatform: 'react-router',
     packageName: '@sentry/react-router',
   }),

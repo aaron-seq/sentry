@@ -27,6 +27,7 @@ import {featureFlag} from 'sentry/gettingStartedDocs/javascript/javascript/featu
 import {t, tct} from 'sentry/locale';
 import {
   getJavascriptLogsFullStackOnboarding,
+  getJavascriptMetricsFullStackOnboarding,
   getJavascriptProfilingOnboarding,
 } from 'sentry/utils/gettingStartedDocs/javascript';
 import {getNodeAgentMonitoringOnboarding} from 'sentry/utils/gettingStartedDocs/node';
@@ -577,6 +578,10 @@ const docs: Docs = {
     configFileName: 'instrument.server.mjs',
   }),
   logsOnboarding: getJavascriptLogsFullStackOnboarding({
+    docsPlatform: 'solidstart',
+    packageName: '@sentry/solidstart',
+  }),
+  metricsOnboarding: getJavascriptMetricsFullStackOnboarding({
     docsPlatform: 'solidstart',
     packageName: '@sentry/solidstart',
   }),

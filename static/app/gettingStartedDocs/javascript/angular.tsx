@@ -27,6 +27,7 @@ import {featureFlag} from 'sentry/gettingStartedDocs/javascript/javascript/featu
 import {t, tct} from 'sentry/locale';
 import {
   getJavascriptLogsOnboarding,
+  getJavascriptMetricsOnboarding,
   getJavascriptProfilingOnboarding,
 } from 'sentry/utils/gettingStartedDocs/javascript';
 
@@ -560,6 +561,12 @@ const logsOnboarding: OnboardingConfig = getJavascriptLogsOnboarding({
   packageName: '@sentry/angular',
 });
 
+const metricsOnboarding: OnboardingConfig = getJavascriptMetricsOnboarding({
+  installSnippetBlock,
+  docsPlatform: 'angular',
+  packageName: '@sentry/angular',
+});
+
 const docs: Docs<PlatformOptions> = {
   onboarding,
   feedbackOnboardingNpm: feedbackOnboarding,
@@ -569,6 +576,7 @@ const docs: Docs<PlatformOptions> = {
   profilingOnboarding,
   featureFlagOnboarding: featureFlag,
   logsOnboarding,
+  metricsOnboarding,
 };
 
 export default docs;

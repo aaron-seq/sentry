@@ -26,6 +26,7 @@ import {featureFlag} from 'sentry/gettingStartedDocs/javascript/javascript/featu
 import {t, tct} from 'sentry/locale';
 import {
   getJavascriptLogsOnboarding,
+  getJavascriptMetricsOnboarding,
   getJavascriptProfilingOnboarding,
 } from 'sentry/utils/gettingStartedDocs/javascript';
 
@@ -387,6 +388,12 @@ const logsOnboarding: OnboardingConfig = getJavascriptLogsOnboarding({
   packageName: '@sentry/ember',
 });
 
+const metricsOnboarding: OnboardingConfig = getJavascriptMetricsOnboarding({
+  installSnippetBlock,
+  docsPlatform: 'ember',
+  packageName: '@sentry/ember',
+});
+
 const docs: Docs = {
   onboarding,
   feedbackOnboardingNpm: feedbackOnboarding,
@@ -395,6 +402,7 @@ const docs: Docs = {
   profilingOnboarding,
   featureFlagOnboarding: featureFlag,
   logsOnboarding,
+  metricsOnboarding,
 };
 
 export default docs;
