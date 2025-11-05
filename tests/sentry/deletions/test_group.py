@@ -1,7 +1,7 @@
 import os
 import random
 from datetime import datetime, timedelta
-from time import time
+from time import sleep, time
 from typing import Any
 from unittest import mock
 from uuid import uuid4
@@ -383,6 +383,32 @@ class DeleteIssuePlatformTest(TestCase, SnubaTestCase, OccurrenceTestMixin):
     def tenant_ids(self) -> dict[str, str]:
         return {"referrer": self.referrer, "organization_id": self.organization.id}
 
+    def poll_for_deletion(
+        self,
+        project_id: int,
+        expected_none: bool = True,
+        max_attempts: int = 10,
+        delay: float = 0.1,
+    ) -> None:
+        """
+        Poll Snuba until issue platform events are deleted or present.
+
+        ClickHouse light deletes are eventually consistent, so we need to poll
+        until the deletion becomes visible in queries.
+        """
+        for attempt in range(max_attempts):
+            result = self.select_issue_platform_events(project_id)
+            if (expected_none and result is None) or (not expected_none and result is not None):
+                return
+            if attempt < max_attempts - 1:
+                sleep(delay)
+
+        # Final check - let the assertion fail with proper error message
+        if expected_none:
+            assert self.select_issue_platform_events(project_id) is None
+        else:
+            assert self.select_issue_platform_events(project_id) is not None
+
     def test_simple_issue_platform(self) -> None:
         # Adding this query here to make sure that the cache is not being used
         assert self.select_error_events(self.project.id) is None
@@ -436,7 +462,8 @@ class DeleteIssuePlatformTest(TestCase, SnubaTestCase, OccurrenceTestMixin):
         # The Issue Platform group and occurrence have been deleted
         assert not Group.objects.filter(id=issue_platform_group.id).exists()
         # assert not nodestore.backend.get(occurrence_node_id)
-        assert self.select_issue_platform_events(self.project.id) is None
+        # Poll for eventual consistency - ClickHouse light deletes are not immediately visible
+        self.poll_for_deletion(self.project.id, expected_none=True)
 
     @mock.patch("sentry.deletions.tasks.nodestore.bulk_snuba_queries")
     def test_issue_platform_batching(self, mock_bulk_snuba_queries: mock.Mock) -> None:
