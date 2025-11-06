@@ -1,5 +1,3 @@
-import logging
-
 from django.db import router, transaction
 from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema
 from rest_framework import status
@@ -40,8 +38,6 @@ from sentry.workflow_engine.endpoints.validators.detector_workflow import (
 from sentry.workflow_engine.endpoints.validators.utils import get_unknown_detector_type_error
 from sentry.workflow_engine.models import Detector
 from sentry.workflow_engine.types import DetectorLifeCycleHooks
-
-logger = logging.getLogger(__name__)
 
 
 def get_detector_validator(
