@@ -4,12 +4,12 @@ import type {
 } from 'sentry/components/onboarding/gettingStartedDoc/types';
 import {StepType} from 'sentry/components/onboarding/gettingStartedDoc/types';
 import {getUploadSourceMapsStep} from 'sentry/components/onboarding/gettingStartedDoc/utils';
-import {t, tct} from 'sentry/locale';
 import {
   getImportInstrumentSnippet,
   getInstallCodeBlock,
   getSdkInitSnippet,
 } from 'sentry/gettingStartedDocs/node/node/utils';
+import {t, tct} from 'sentry/locale';
 
 const getSdkSetupSnippet = () => `
 ${getImportInstrumentSnippet('esm', 'ts')}
@@ -90,7 +90,7 @@ export class AppModule {}
 
 export const onboarding: OnboardingConfig = {
   introduction: () =>
-    tct('In this quick guide you'll use [strong:npm] or [strong:yarn] to set up:', {
+    tct("In this quick guide you'll use [strong:npm] or [strong:yarn] to set up:", {
       strong: <strong />,
     }),
   install: params => [
